@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nueva pestaña</title>
+<!-- Favicon transparente: la pestaña no muestra ningún icono -->
+<link rel="icon" href="vacio32.png">
+<style>
+  html, body { margin: 0; height: 100%; background: #1f1f1e; overflow: hidden; }
+  canvas { display: block; position: fixed; inset: 0; }
+  form {
+    position: fixed; top: 38%; left: 50%; transform: translate(-50%, -50%);
+    width: min(560px, calc(100% - 32px));
+  }
+  input {
+    width: 100%; box-sizing: border-box; padding: 14px 20px;
+    font: 16px "Segoe UI", system-ui, sans-serif; color: #e8e6e1;
+    background: rgba(31, 31, 30, 0.85); backdrop-filter: blur(6px);
+    border: 1px solid #3a3a38; border-radius: 14px; outline: none;
+    transition: border-color .2s;
+  }
+  #gmail {
+    position: fixed; top: 18px; right: 24px; padding: 6px 12px; border-radius: 8px;
+    font: 14px "Segoe UI", system-ui, sans-serif; color: #d8d6d0; text-decoration: none;
+  }
+  #gmail:hover { background: rgba(255, 255, 255, 0.08); text-decoration: underline; }
+  input::placeholder { color: #8a8984; }
+  input:focus { border-color: #6b6a66; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<a id="gmail" href="https://mail.google.com/">Gmail</a>
+<form id="buscar">
+  <input id="q" type="search" placeholder="Buscar en la web" autocomplete="off" autofocus>
+</form>
+<script src="fondo.js"></script>
+<script src="buscar.js"></script>
+</body>
+</html>
