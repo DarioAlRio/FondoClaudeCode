@@ -1,6 +1,6 @@
 // Fondo de caracteres que aparecen en "manchas" que se mueven lentamente.
 const CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=-';
-const CW = 7.2, CH = 12.5;          // tamaño de cada celda
+const CW = 5.8, CH = 10;          // tamaño de cada celda
 const FPS = 30;
 const SPEED = 0.0006;              // velocidad de movimiento de las manchas
 
@@ -15,7 +15,7 @@ function resize() {
   canvas.style.width = innerWidth + 'px';
   canvas.style.height = innerHeight + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.font = 'bold 10px Consolas, "Courier New", monospace';
+  ctx.font = 'bold 8px Consolas, "Courier New", monospace';
   ctx.textBaseline = 'top';
   cols = Math.ceil(innerWidth / CW);
   rows = Math.ceil(innerHeight / CH);
