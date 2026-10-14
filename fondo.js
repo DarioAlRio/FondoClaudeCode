@@ -20,7 +20,9 @@ function resize() {
   cols = Math.ceil(innerWidth / CW);
   rows = Math.ceil(innerHeight / CH);
   grid = Array.from({ length: cols * rows }, rndChar);
+  rastro = new Float32Array(cols * rows);
 }
+let rastro;                         // claridad que deja el ratón en cada celda (0–1)
 const rndChar = () => CHARS[(Math.random() * CHARS.length) | 0];
 
 // Ruido de valor 3D sencillo
@@ -54,6 +56,33 @@ const mouse = { x: -9999, y: -9999, fuerza: 0, ultimo: -9999 };
 addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.ultimo = performance.now(); });
 document.addEventListener('mouseleave', () => { mouse.ultimo = -9999; });
 
+const DURACION_RASTRO = 2.5;        // segundos aprox. que tarda el humo en volver
+let prevX = null, prevY = null;
+
+function marcarRastro(now) {
+  // Se apaga poco a poco
+  const k = Math.pow(0.05, 1 / (FPS * DURACION_RASTRO));
+  for (let i = 0; i < rastro.length; i++) rastro[i] *= k;
+  if (now - mouse.ultimo > 100) { prevX = prevY = null; return; }
+  // Marca el camino desde la posición anterior, para que no queden huecos al mover rápido
+  const x0 = prevX ?? mouse.x, y0 = prevY ?? mouse.y;
+  const pasos = Math.max(1, Math.ceil(Math.hypot(mouse.x - x0, mouse.y - y0) / (RADIO / 3)));
+  const R = RADIO * 0.9, cr = Math.ceil(R * 1.5 / CW), rr = Math.ceil(R * 1.5 / CH);
+  for (let s = 1; s <= pasos; s++) {
+    const px = x0 + (mouse.x - x0) * s / pasos, py = y0 + (mouse.y - y0) * s / pasos;
+    const cx = Math.round(px / CW), cy = Math.round(py / CH);
+    for (let y = Math.max(0, cy - rr); y <= Math.min(rows - 1, cy + rr); y++) {
+      for (let x = Math.max(0, cx - cr); x <= Math.min(cols - 1, cx + cr); x++) {
+        const dx = x * CW - px, dy = y * CH - py;
+        const f = Math.exp(-(dx * dx + dy * dy) / (R * R));
+        const i = y * cols + x;
+        if (f > rastro[i]) rastro[i] = f;
+      }
+    }
+  }
+  prevX = mouse.x; prevY = mouse.y;
+}
+
 let last = 0;
 function frame(now) {
   requestAnimationFrame(frame);
@@ -66,6 +95,7 @@ function frame(now) {
   const tw = now * 0.00008;                 // remolino lento del humo
   // El efecto del ratón aparece al moverlo y se desvanece poco a poco al pararlo
   mouse.fuerza += ((now - mouse.ultimo < 300 ? 1 : 0) - mouse.fuerza) * 0.08;
+  marcarRastro(now);
   ctx.clearRect(0, 0, innerWidth, innerHeight);
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -85,7 +115,10 @@ function frame(now) {
       const n = noise(fx * 0.06, fy * 0.1, 0.5) * 0.65
               + noise(fx * 0.14, fy * 0.22, 1.5) * 0.25
               + noise(fx * 0.35, fy * 0.5, 2.5) * 0.10;
-      const v = (n - 0.5) / 0.28 + push * 0.9;  // borde suave; junto al cursor se despeja
+      // Junto al cursor se despeja; por donde pasó queda claro y el humo vuelve poco a poco,
+      // primero por sus zonas más densas, para que se rellene de forma irregular
+      const r = rastro[y * cols + x];
+      const v = (n - 0.5) / 0.28 + push * 0.9 + r * (0.4 + n * 1.2);
       if (v <= 0) continue;
       // Brillo: destellos irregulares que aparecen, se desplazan y se apagan al azar
       const g = noise(x * 0.07 + 300, y * 0.11 + 300, now * 0.0005)
