@@ -39,7 +39,7 @@ function noise(x, y, z) {
   return lerp(a, b, zf);
 }
 
-const PX_PER_SEC = 30;              // velocidad de las letras hacia la derecha
+const PX_PER_SEC = 42;              // velocidad del humo
 
 // Letra fija para cada celda del mundo, que cambia cada ~2 s en momentos distintos
 function charAt(wx, y, now) {
@@ -48,8 +48,11 @@ function charAt(wx, y, now) {
   return CHARS[(h(wx, y, epoch) * 255 + h(y, epoch, wx) * 255 | 0) % CHARS.length];
 }
 
-// Dirección horizontal al azar en cada pestaña: 1 = hacia la derecha, -1 = hacia la izquierda
-const DIR_X = Math.random() < 0.5 ? 1 : -1;
+// Dirección al azar en cada pestaña: cualquier ángulo hacia abajo, entre 20° y 160°
+const ANGULO = (20 + Math.random() * 140) * Math.PI / 180;
+const DIR_X = Math.cos(ANGULO), DIR_Y = Math.sin(ANGULO);
+// Punto de partida al azar, para que cada pestaña empiece con un humo distinto
+const INICIO_X = Math.random() * 1000, INICIO_Y = Math.random() * 1000;
 
 const RADIO = 90;                   // tamaño (px) de la zona que aparta el ratón
 const mouse = { x: -9999, y: -9999, fuerza: 0, ultimo: -9999 };
@@ -91,7 +94,7 @@ function frame(now) {
   const t = now * SPEED;
   // Las letras quedan fijas; el "humo" se desplaza en diagonal hacia abajo
   const d = now / 1000 * PX_PER_SEC;
-  const sx = DIR_X * d / CW, sy = d / CH;
+  const sx = INICIO_X + DIR_X * d / CW, sy = INICIO_Y + DIR_Y * d / CH;
   const tw = now * 0.00008;                 // remolino lento del humo
   // El efecto del ratón aparece al moverlo y se desvanece poco a poco al pararlo
   mouse.fuerza += ((now - mouse.ultimo < 300 ? 1 : 0) - mouse.fuerza) * 0.08;
