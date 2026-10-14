@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Fondo animado (estilo Claude Code)",
+  "name": "FondoClaudeCode",
   "version": "1.0",
   "description": "Nueva pestaña con caracteres animados sobre fondo oscuro.",
   "icons": { "16": "vacio16.png", "32": "vacio32.png", "48": "vacio48.png", "128": "vacio128.png" },

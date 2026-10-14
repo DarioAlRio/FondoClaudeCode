@@ -1,4 +1,4 @@
-# FondoClaude
+# FondoClaudeCode
 
 Extensión de Chrome que sustituye la Nueva pestaña por un fondo animado de letras, inspirado en la pantalla de inicio de Claude Code.
 
